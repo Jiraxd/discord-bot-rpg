@@ -1,51 +1,48 @@
-import * as fs from "fs";
-import * as path from "path";
+import { CharacterClass } from "@prisma/client";
 
-const LOG_DIR = path.join(process.cwd(), "logs");
-const LOG_FILE = path.join(
-  LOG_DIR,
-  `${new Date().toISOString().slice(0, 10)}.log`
-);
-const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
-
-const originalConsole = {
-  log: console.log,
+export const classDetails = {
+  [CharacterClass.MAGE]: { icon: "🧙", color: 0x5865f2 },
+  [CharacterClass.WARRIOR]: { icon: "⚔️", color: 0xed4245 },
+  [CharacterClass.ARCHER]: { icon: "🏹", color: 0x57f287 },
 };
 
-if (!fs.existsSync(LOG_DIR)) {
-  try {
-    fs.mkdirSync(LOG_DIR, { recursive: true });
-    console.log(`Created logs directory at: ${LOG_DIR}`);
-  } catch (error) {
-    console.error(`Failed to create logs directory: ${error}`);
+export function getRequiredXP(currentLevel: number): number {
+  if (currentLevel < 1) return 100;
+  if (currentLevel >= 100) return Infinity;
+
+  if (currentLevel < 10) {
+    return 100 + currentLevel * 25;
   }
+
+  if (currentLevel < 30) {
+    return 350 + Math.floor(Math.pow(currentLevel, 1.5) * 10);
+  }
+
+  if (currentLevel < 60) {
+    return 1000 + Math.floor(Math.pow(currentLevel, 1.8) * 15);
+  }
+
+  return 5000 + Math.floor(Math.pow(currentLevel, 2.2) * 20);
 }
 
-function writeToLogFile(prefix: string, args: any[]): void {
-  try {
-    if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > MAX_LOG_SIZE) {
-      const backupFile = `${LOG_FILE}.${Date.now()}.backup`;
-      fs.renameSync(LOG_FILE, backupFile);
-    }
+export function getLevelProgress(
+  currentLevel: number,
+  currentXP: number
+): {
+  nextLevelXP: number;
+  remainingXP: number;
+  progressPercent: number;
+} {
+  const nextLevelXP = getRequiredXP(currentLevel);
+  const remainingXP = Math.max(0, nextLevelXP - currentXP);
+  const progressPercent = Math.min(
+    Math.floor((currentXP / nextLevelXP) * 100),
+    100
+  );
 
-    const timestamp = new Date().toISOString();
-    const message = args
-      .map((arg) =>
-        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
-      )
-      .join(" ");
-
-    const logEntry = `[${timestamp}] ${
-      prefix ? prefix + ": " : ""
-    }${message}\n`;
-
-    fs.appendFileSync(LOG_FILE, logEntry);
-  } catch (error) {
-    console.error("Failed to write to log file:", error);
-  }
+  return {
+    nextLevelXP,
+    remainingXP,
+    progressPercent,
+  };
 }
-
-console.log = function (...args: any[]): void {
-  writeToLogFile("", args);
-  originalConsole.log(...args);
-};

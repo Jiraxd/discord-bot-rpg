@@ -1,4 +1,4 @@
-import "./misc/utils";
+import "./misc/logs";
 
 import { Client, Events, ActivityType, GatewayIntentBits } from "discord.js";
 import dotenv from "dotenv";

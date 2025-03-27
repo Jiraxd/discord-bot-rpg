@@ -150,6 +150,7 @@ export const body: Command = {
             maxHealth: classStats[classChoice].maxHealth,
             attack: classStats[classChoice].attack,
             defense: classStats[classChoice].defense,
+            money: 10,
           },
         });
 
