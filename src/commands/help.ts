@@ -89,7 +89,7 @@ export const body: Command = {
         const guideEmbed = new EmbedBuilder()
           .setColor(0x3ba55c)
           .setTitle("Game Guide")
-          .setDescription("Learn how to play Discord RPG!")
+          .setDescription("Learn how to play Undefined RPG!")
           .addFields(
             {
               name: "⚔️ Combat",
@@ -155,7 +155,7 @@ export const body: Command = {
             {
               name: "👑 Server Admin Settings",
               value:
-                "Server administrators can use `/settingsserver` to configure server-wide game options.",
+                "Server administrators can use `/serversettings` to configure server-wide game options.",
             }
           );
 
