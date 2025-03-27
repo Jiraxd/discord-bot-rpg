@@ -165,11 +165,11 @@ export const body: Command = {
       }
     });
 
-    collector.on("end", async () => {
+    collector.on("end", async (collected, reason) => {
       try {
         await interaction.editReply({ components: [] });
       } catch (error) {
-        console.error("Error removing buttons:", error);
+        console.error("Error removing buttons from help command:", error);
       }
     });
   },

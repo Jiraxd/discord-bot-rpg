@@ -199,7 +199,7 @@ export const body: Command = {
         );
       });
 
-      collector.on("end", async (collected) => {
+      collector.on("end", async (collected, reason) => {
         if (collected.size === 0) {
           try {
             await interaction.editReply({
