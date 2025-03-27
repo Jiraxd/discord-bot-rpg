@@ -10,14 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Main user model
+enum CharacterClass {
+  MAGE
+  WARRIOR
+  ARCHER
+}
+
 model User {
-  id             String   @id
-  createdAt      DateTime @default(now())
-  lastActivityAt DateTime @default(now()) @updatedAt
-  money          Int      @default(0)
-  xp             Int      @default(0)
-  level          Int      @default(1)
+  id             String          @id
+  createdAt      DateTime        @default(now())
+  lastActivityAt DateTime        @default(now()) @updatedAt
+  money          Int             @default(0)
+  xp             Int             @default(0)
+  level          Int             @default(1)
+  class          CharacterClass?
 
   health    Int @default(100)
   maxHealth Int @default(100)
