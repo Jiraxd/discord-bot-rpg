@@ -1,3 +1,5 @@
+import "./misc/utils";
+
 import { Client, Events, ActivityType, GatewayIntentBits } from "discord.js";
 import dotenv from "dotenv";
 import { CommandManager } from "./managers/cmd.manager";
