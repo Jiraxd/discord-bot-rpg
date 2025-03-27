@@ -21,7 +21,9 @@ client.once(Events.ClientReady, async (ctx) => {
   console.log(`${client.user?.username} is ready!`);
   commandManager.registerCommands();
   commandManager.deployCommands();
-  client.user?.setActivity("j1r4.vercel.app", { type: ActivityType.Watching });
+  client.user?.setActivity("/help | j1r4.vercel.app", {
+    type: ActivityType.Watching,
+  });
   console.log("Successfully finished startup");
 });
 
