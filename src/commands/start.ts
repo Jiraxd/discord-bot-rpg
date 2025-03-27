@@ -6,6 +6,7 @@ import {
   ButtonStyle,
   ComponentType,
   ButtonInteraction,
+  MessageFlags,
 } from "discord.js";
 import { Command } from "../managers/cmd.manager";
 import prisma from "../misc/db";
@@ -69,7 +70,7 @@ export const body: Command = {
 
         await interaction.reply({
           embeds: [alreadyStartedEmbed],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -120,11 +121,12 @@ export const body: Command = {
           .setEmoji("🏹")
       );
 
-      const response = await interaction.reply({
+      await interaction.reply({
         embeds: [classSelectionEmbed],
         components: [buttons],
-        fetchReply: true,
       });
+
+      const response = await interaction.fetchReply();
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -135,7 +137,7 @@ export const body: Command = {
         if (i.user.id !== interaction.user.id) {
           await i.reply({
             content: "This character creation is not for you!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           return;
         }
@@ -215,7 +217,7 @@ export const body: Command = {
       await interaction.reply({
         content:
           "There was an error creating your character. Please try again later.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

@@ -2,6 +2,7 @@ import {
   ChatInputCommandInteraction,
   CommandInteraction,
   EmbedBuilder,
+  MessageFlags,
   User,
 } from "discord.js";
 import { Command, CommandParameterType } from "../managers/cmd.manager";
@@ -50,7 +51,10 @@ export const body: Command = {
           .setFooter({ text: "Adventure awaits..." })
           .setTimestamp();
 
-        await interaction.reply({ embeds: [noProfileEmbed], ephemeral: true });
+        await interaction.reply({
+          embeds: [noProfileEmbed],
+          flags: MessageFlags.Ephemeral,
+        });
         return;
       }
 
@@ -108,7 +112,7 @@ export const body: Command = {
       await interaction.reply({
         content:
           "There was an error retrieving the profile. Please try again later.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

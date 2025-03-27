@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  MessageFlags,
 } from "discord.js";
 import { Command } from "../managers/cmd.manager";
 
@@ -63,11 +64,12 @@ export const body: Command = {
         .setEmoji("🏠")
     );
 
-    const response = await interaction.reply({
+    await interaction.reply({
       embeds: [helpEmbed],
       components: [buttons],
-      fetchReply: true,
     });
+
+    const response = await interaction.fetchReply();
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -78,7 +80,7 @@ export const body: Command = {
       if (i.user.id !== interaction.user.id) {
         await i.reply({
           content: "These buttons are not for you!",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
