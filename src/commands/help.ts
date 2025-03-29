@@ -94,7 +94,7 @@ export const body: Command = {
             {
               name: "⚔️ Combat",
               value:
-                "Use `/attack` to battle monsters. Win to gain XP and gold.",
+                "Use `/explore` to explore new areas. Find chests and battle monsters using /attack.",
             },
             {
               name: "💰 Economy",
@@ -125,8 +125,7 @@ export const body: Command = {
             },
             {
               name: "⚔️ Combat Commands",
-              value:
-                "`/attack` - Attack a monster\n`/heal` - Restore health points",
+              value: "`/attack` - Attack a monster",
             },
             {
               name: "💰 Economy Commands",
