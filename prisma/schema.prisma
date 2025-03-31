@@ -30,7 +30,10 @@ model User {
   attack    Int @default(10)
   defense   Int @default(5)
 
-  inventory Item[]
+  inventory       Item[]
+  activeQuest     Quest?  @relation("ActiveQuest")
+  availableQuests Quest[] @relation("AvailableQuests")
+  questId         Int?
 
   @@map("users")
 }
@@ -43,4 +46,19 @@ model Item {
   userId String
 
   @@map("items")
+}
+
+model Quest {
+  id        Int       @id @default(autoincrement())
+  questId   String
+  createdAt DateTime  @default(now())
+  startedAt DateTime?
+
+  activeFor       User?   @relation("ActiveQuest", fields: [activeForUserId], references: [id], onDelete: SetNull)
+  activeForUserId String? @unique
+
+  availableFor       User?   @relation("AvailableQuests", fields: [availableForUserId], references: [id], onDelete: SetNull)
+  availableForUserId String?
+
+  @@map("quests")
 }

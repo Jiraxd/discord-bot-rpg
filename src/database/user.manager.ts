@@ -4,7 +4,7 @@ export async function getUser(discordId: string) {
   try {
     let user = await prisma.user.findUnique({
       where: { id: discordId },
-      include: { inventory: true },
+      include: { inventory: true, activeQuest: true, availableQuests: true },
     });
 
     return user;

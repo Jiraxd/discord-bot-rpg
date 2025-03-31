@@ -1,4 +1,5 @@
 import { CharacterClass } from "@prisma/client";
+import { CommandInteraction, EmbedBuilder, User } from "discord.js";
 
 export const classDetails = {
   [CharacterClass.MAGE]: { icon: "🧙", color: 0x5865f2 },
@@ -45,4 +46,17 @@ export function getLevelProgress(
     remainingXP,
     progressPercent,
   };
+}
+
+export function getNoProfileEmbed(): EmbedBuilder {
+  return new EmbedBuilder()
+    .setColor(0xfee75c)
+    .setTitle("No Character Found")
+    .setDescription("You don't have a character yet!")
+    .addFields({
+      name: "Get Started",
+      value: "Use `/start` to create your character and begin your adventure.",
+    })
+    .setFooter({ text: "Adventure awaits..." })
+    .setTimestamp();
 }
