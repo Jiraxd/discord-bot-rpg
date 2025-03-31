@@ -2,6 +2,7 @@ import { Item, User } from "@prisma/client";
 
 export type QuestInfo = {
   id: string;
+  length: number; // in minutes
   name: string;
   description: string;
   level: number;
@@ -17,7 +18,6 @@ export type QuestReward = {
   id: string;
   state: number[];
   weight: number;
-  amount: number;
 };
 
 export function getQuestInfo(id: string) {
@@ -57,23 +57,25 @@ const quests: QuestInfo[] = [
     name: "The Lost Sword",
     description: "Find the lost sword of the ancient hero.",
     level: 1,
-    itemReward: [{ id: "sword_1", state: [0, 0], weight: 10, amount: 1 }],
+    itemReward: [{ id: "sword_1", state: [0, 0], weight: 10 }],
     experienceMax: 100,
     experienceMin: 50,
     goldMax: 10,
     goldMin: 5,
     itemRewardAmount: 1,
+    length: 1,
   },
   {
     id: "2",
     name: "The Dragon's Lair",
     description: "Defeat the dragon and claim its treasure.",
     level: 2,
-    itemReward: [{ id: "dragon_scale", state: [0, 0], weight: 10, amount: 2 }],
-    itemRewardAmount: 1,
+    itemReward: [{ id: "dragon_scale", state: [0, 0], weight: 10 }],
+    itemRewardAmount: 3,
     experienceMax: 150,
     experienceMin: 75,
     goldMax: 30,
     goldMin: 5,
+    length: 2,
   },
 ];

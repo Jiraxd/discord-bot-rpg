@@ -34,8 +34,178 @@ export const body: Command = {
     }
 
     if (user.activeQuest) {
-      // todo
-      return;
+      const questInfo = getQuestInfo(user.activeQuest.questId);
+      const startTime = user.activeQuest.startedAt || new Date();
+      const questDuration = questInfo.length * 60 * 1000; // convert minutes to milliseconds
+      const endTime = new Date(startTime.getTime() + questDuration);
+      const currentTime = new Date();
+
+      // quest endedm, give rewards
+      if (currentTime >= endTime) {
+        const goldReward =
+          Math.floor(
+            Math.random() * (questInfo.goldMax - questInfo.goldMin + 1)
+          ) + questInfo.goldMin;
+        const xpReward =
+          Math.floor(
+            Math.random() *
+              (questInfo.experienceMax - questInfo.experienceMin + 1)
+          ) + questInfo.experienceMin;
+
+        const itemRewards = [];
+        if (questInfo.itemReward.length > 0 && questInfo.itemRewardAmount > 0) {
+          const totalWeight = questInfo.itemReward.reduce(
+            (sum, item) => sum + item.weight,
+            0
+          );
+          const itemRewardAmount =
+            Math.floor(Math.random() * questInfo.itemRewardAmount) + 1;
+
+          for (let i = 0; i < itemRewardAmount; i++) {
+            let randomValue = Math.random() * totalWeight;
+            let selectedItem = null;
+
+            for (const item of questInfo.itemReward) {
+              randomValue -= item.weight;
+              if (randomValue <= 0) {
+                selectedItem = item;
+                break;
+              }
+            }
+
+            if (selectedItem) {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  inventory: {
+                    create: {
+                      state: selectedItem.state,
+                      itemId: selectedItem.id,
+                    },
+                  },
+                },
+              });
+
+              itemRewards.push(selectedItem);
+            }
+          }
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            money: { increment: goldReward },
+            xp: { increment: xpReward },
+          },
+        });
+
+        await prisma.quest.delete({
+          where: { id: user.activeQuest.id },
+        });
+
+        const completionEmbed = new EmbedBuilder()
+          .setTitle("Quest Completed!")
+          .setDescription(`You have completed the quest: **${questInfo.name}**`)
+          .addFields({
+            name: "Rewards",
+            value: `💰 ${goldReward} gold\n✨ ${xpReward} XP`,
+          })
+          .setColor("#00FF00");
+
+        if (itemRewards.length > 0) {
+          completionEmbed.addFields({
+            name: "Items Received",
+            value: itemRewards.map((item) => `${item.id}`).join("\n"),
+          });
+        }
+
+        await interaction.reply({ embeds: [completionEmbed] });
+        return;
+      } else {
+        const timeRemaining = endTime.getTime() - currentTime.getTime();
+        const minutesRemaining = Math.ceil(timeRemaining / (60 * 1000));
+
+        const progressEmbed = new EmbedBuilder()
+          .setTitle("Active Quest")
+          .setDescription(
+            `You are currently on the quest: **${questInfo.name}**`
+          )
+          .addFields(
+            { name: "Objective", value: questInfo.description },
+            {
+              name: "Time Remaining",
+              value: `${minutesRemaining} minute${
+                minutesRemaining !== 1 ? "s" : ""
+              }`,
+            },
+            {
+              name: "Possible Rewards",
+              value: `💰 ${questInfo.goldMin}-${questInfo.goldMax} gold\n✨ ${questInfo.experienceMin}-${questInfo.experienceMax} XP`,
+            },
+            {
+              name: "Item Rewards",
+              value: `You may receive up to ${questInfo.itemRewardAmount} item(s) upon completion.`,
+            }
+          )
+          .setColor("#FFD700");
+
+        if (questInfo.itemReward.length > 0) {
+          progressEmbed.addFields({
+            name: "Possible Item Rewards",
+            value: `You may receive up to ${questInfo.itemRewardAmount} item(s) upon completion.`,
+          });
+        }
+
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("abandon_quest")
+            .setLabel("Abandon Quest")
+            .setStyle(ButtonStyle.Danger)
+        );
+
+        await interaction.reply({
+          embeds: [progressEmbed],
+          components: [row],
+        });
+
+        const response = await interaction.fetchReply();
+        const collector = response.createMessageComponentCollector({
+          componentType: ComponentType.Button,
+          time: 60000,
+        });
+
+        collector.on("collect", async (buttonInteraction) => {
+          if (buttonInteraction.user.id !== interaction.user.id) {
+            await buttonInteraction.reply({
+              content: "This quest belongs to someone else.",
+              ephemeral: true,
+            });
+            return;
+          }
+
+          if (buttonInteraction.customId === "abandon_quest") {
+            if (!user.activeQuest) {
+              await buttonInteraction.reply({
+                content: "You don't have an active quest.",
+                ephemeral: true,
+              });
+              return;
+            }
+            await prisma.quest.delete({
+              where: { id: user.activeQuest.id },
+            });
+
+            await buttonInteraction.update({
+              content:
+                "You have abandoned your quest. Use /quest to find a new one.",
+              embeds: [],
+              components: [],
+            });
+          }
+        });
+
+        return;
+      }
     }
 
     let availableQuests = user.availableQuests;

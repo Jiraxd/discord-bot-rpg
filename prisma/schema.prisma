@@ -33,14 +33,14 @@ model User {
   inventory       Item[]
   activeQuest     Quest?  @relation("ActiveQuest")
   availableQuests Quest[] @relation("AvailableQuests")
-  questId         Int?
 
   @@map("users")
 }
 
 model Item {
-  id    Int   @id @default(autoincrement())
-  state Int[]
+  id     Int    @id @default(autoincrement())
+  itemId String
+  state  Int[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
