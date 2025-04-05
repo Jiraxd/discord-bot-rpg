@@ -1,3 +1,12 @@
+import { armors } from "./items/armors";
+import { craftingIngredients } from "./items/crafting";
+import { food } from "./items/food";
+import { keys } from "./items/keys";
+import { maps } from "./items/maps";
+import { misc } from "./items/misc";
+import { potions } from "./items/potions";
+import { weapons } from "./items/weapons";
+
 export type Item = {
   itemId: string;
   state: number[]; // used to store item specific states (e.g. durability, enchantment level, added skills, etc.)
@@ -63,5 +72,15 @@ export enum ItemType {
   MISC = "Misc",
   CRAFTING = "Crafting",
   MAP = "Map",
-  KEYSTONE = "Keystone",
+  KEY = "Key",
 }
+
+export const items: Item[] = armors.concat(
+  weapons,
+  craftingIngredients,
+  food,
+  keys,
+  maps,
+  misc,
+  potions
+);
