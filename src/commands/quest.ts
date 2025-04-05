@@ -125,6 +125,18 @@ export const body: Command = {
         const timeRemaining = endTime.getTime() - currentTime.getTime();
         const minutesRemaining = Math.ceil(timeRemaining / (60 * 1000));
 
+        const totalQuestTime = questInfo.length * 60 * 1000;
+        const elapsedTime = totalQuestTime - timeRemaining;
+        const progressPercent = Math.min(
+          100,
+          Math.floor((elapsedTime / totalQuestTime) * 100)
+        );
+
+        const filledSegments = Math.floor(progressPercent / 10);
+        const emptySegments = 10 - filledSegments;
+        const progressBar =
+          "█".repeat(filledSegments) + "░".repeat(emptySegments);
+
         const progressEmbed = new EmbedBuilder()
           .setTitle("Active Quest")
           .setDescription(
@@ -134,9 +146,9 @@ export const body: Command = {
             { name: "Objective", value: questInfo.description },
             {
               name: "Time Remaining",
-              value: `${minutesRemaining} minute${
+              value: `${progressBar} ${progressPercent}%\n${minutesRemaining} minute${
                 minutesRemaining !== 1 ? "s" : ""
-              }`,
+              } remaining`,
             },
             {
               name: "Possible Rewards",
@@ -148,13 +160,6 @@ export const body: Command = {
             }
           )
           .setColor("#FFD700");
-
-        if (questInfo.itemReward.length > 0) {
-          progressEmbed.addFields({
-            name: "Possible Item Rewards",
-            value: `You may receive up to ${questInfo.itemRewardAmount} item(s) upon completion.`,
-          });
-        }
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
