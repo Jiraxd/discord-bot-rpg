@@ -5,3 +5,5 @@
 RPG game written in typescript for discord
 
 *If i'm bored, might come back to it :)*
+
+ps: tokens in .env are resetted :)
